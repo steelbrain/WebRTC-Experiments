@@ -1,7 +1,7 @@
 "use strict";
 class WebRTCCall extends WebRTC{
-  constructor(){
-    super();
+  constructor(Config, Constraints){
+    super(Config, Constraints);
     let Me = this;
     Me.MediaStatus = false;
     Me.MediaStream = null;

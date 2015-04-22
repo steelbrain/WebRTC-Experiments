@@ -25,7 +25,6 @@ class WebRTC extends EventEmitter{
     return new Promise(function(Resolve, Reject){
       (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia).call(navigator, Me.MediaConstraints, function(Stream){
         Me.Connection.addStream(Stream);
-        console.log("Stream Added");
         Resolve(Stream);
       }, Reject)
     });
@@ -53,7 +52,6 @@ class WebRTC extends EventEmitter{
   createAnswer(){
     let Me = this;
     return new Promise(function(Resolve, Reject){
-      console.log(Me.MediaConstraints);
       Me.Connection.createAnswer(function(Answer){
         Me.Connection.setLocalDescription(new RTCSessionDescription(Answer));
         Resolve(Answer);
