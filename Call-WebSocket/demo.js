@@ -1,45 +1,36 @@
 "use strict";
 
 document.addEventListener('DOMContentLoaded', function(){
-  let Socket = new WebSocket("ws://localhost:9854");
-  let Connection = new WebRTCCall();
-  /** < Custom Events Emulation> **/
-  let Events = new EventEmitter();
-  Socket.sendJSON = function(Data){
-    Socket.send(JSON.stringify(Data));
-  };
-  Socket.addEventListener('message', function(Message){
-    Message = JSON.parse(Message.data);
-    Events.emit(Message.type, Message);
-  });
-  /** < /Custom Events Emulation> **/
+  let Socket = new WebSocketP("ws://localhost:9854");
+  let Call = new WebRTCCall();
 
-
-  /** < Communication Methods> **/
-  Connection.on('addstream', function(Event){
+  Call.on('addstream', function(Event){
     addVideo(Event.stream);
   });
-  Events.on('Candidate', Connection.OnCandidate.bind(Connection));
-  Connection.on('candidate', Socket.sendJSON);
-  /** < /Communication Methods> **/
+
+  Socket.on('Candidate', function(Candidate){
+    Call.OnCandidate(Candidate)
+  });
+  Call.on('candidate', function(Info){
+    Socket.Send(Info.type, Info)
+  });
 
   // Accept Call
-  Events.on('Offer', function(Message){
-    Connection.OnOffer(Message.Offer).then(function(Info){
-      Socket.sendJSON({type: 'Answer', Answer: Info.Answer});
+  Socket.on('Offer', function(Message){
+    Call.OnOffer(Message).then(function(Info){
+      Socket.Send('Answer', Info.Answer)
       addVideo(Info.Stream);
     });
   });
 
   // Request Call
-  Events.on('Answer', function(Message){
-    Connection.setRemote(Message.Answer);
+  Socket.on('Answer', function(Answer){
+    Call.setRemote(Answer);
   });
   window.Call = function(){
-    Connection.Call(true, true).then(function(Info){
-      console.log(Info);
+    Call.Call(true, true).then(function(Info){
       addVideo(Info.Stream);
-      Socket.sendJSON({type: 'Offer', Offer: Info.Offer});
+      Socket.Send('Offer', Info.Offer)
     });
   };
   // Helpers
