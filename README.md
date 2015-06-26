@@ -38,7 +38,7 @@ Events: candidate
   - A Peer Connection is Created
   - Media Resources are Requested from the User
   - An Offer is Created
-  - Offer is sent to the User
+  - Offer is sent to the Callee
   - Response is received from the Callee
 - For Callee
  - A Peer Connection is Created
