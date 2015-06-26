@@ -35,11 +35,11 @@ class WebRTCCall extends WebRTC{
       }, Reject);
     });
   }
-  OnCandidate(Message){
+  GotCandidate(Message){
     if(this.MediaStatus)
       this.addCandidate(new RTCIceCandidate({sdpMLineIndex: Message.label,candidate: Message.candidate}));
   }
-  OnOffer(Offer){
+  GotOffer(Offer){
     let Me = this;
     return new Promise(function(Resolve, Reject){
       let MediaPromise;

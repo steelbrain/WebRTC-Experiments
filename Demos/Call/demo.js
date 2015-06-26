@@ -5,11 +5,11 @@ document.addEventListener('DOMContentLoaded', function(){
   let Call = new WebRTCCall();
 
   Call.on('addstream', function(Event){
-    addVideo(Event.stream);
+    showVideo(Event.stream);
   });
 
   Socket.on('Candidate', function(Candidate){
-    Call.OnCandidate(Candidate)
+    Call.GotCandidate(Candidate)
   });
   Call.on('candidate', function(Info){
     Socket.Send(Info.type, Info)
@@ -17,24 +17,24 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Accept Call
   Socket.on('Offer', function(Message){
-    Call.OnOffer(Message).then(function(Info){
+    Call.GotOffer(Message).then(function(Info){
       Socket.Send('Answer', Info.Answer)
-      addVideo(Info.Stream);
+      showVideo(Info.Stream);
     });
   });
 
-  // Request Call
+  // On Call Answered
   Socket.on('Answer', function(Answer){
     Call.setRemote(Answer);
   });
   window.Call = function(){
     Call.Call(true, true).then(function(Info){
-      addVideo(Info.Stream);
+      showVideo(Info.Stream);
       Socket.Send('Offer', Info.Offer)
     });
   };
   // Helpers
-  window.addVideo = function(Source){
+  window.showVideo = function(Source){
     var Video = document.createElement('video');
     Video.src = URL.createObjectURL(Source);
     document.body.appendChild(Video);
