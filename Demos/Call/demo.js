@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 
   Socket.on('Candidate', function(Candidate){
-    Call.GotCandidate(Candidate)
+    Call.gotCandidate(Candidate)
   });
   Call.on('candidate', function(Info){
     Socket.Send(Info.type, Info)
@@ -17,9 +17,10 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Accept Call
   Socket.on('Offer', function(Message){
-    Call.GotOffer(Message).then(function(Info){
+    Call.gotOffer(Message).then(function(Info){
+      console.log(Info);
       Socket.Send('Answer', Info.Answer)
-      showVideo(Info.Stream);
+      showVideo(Info.LocalStream);
     });
   });
 
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   window.Call = function(){
     Call.Call(true, true).then(function(Info){
-      showVideo(Info.Stream);
+      showVideo(Info.LocalStream);
       Socket.Send('Offer', Info.Offer)
     });
   };

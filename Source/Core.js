@@ -4,6 +4,7 @@ class WebRTC extends EventEmitter{
   // Prototype Stuff
   constructor(Config, Constraints){
     super();
+    let Me = this
 
     Config = Config || {
       iceServers :[{'url': WebRTC.IsMozilla ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302'}]
@@ -11,11 +12,19 @@ class WebRTC extends EventEmitter{
     Constraints = Constraints || {
       optional: [{DtlsSrtpKeyAgreement: true},{RtpDataChannels: true}]
     };
-    this.ID = (Math.random().toString(36)+'00000000000000000').slice(2, 7 + 2);
     this.Connection = new (window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection)(Config, Constraints);
 
     this.Connection.addEventListener('addstream', this.emit.bind(this, 'addstream'));
-    this.Connection.addEventListener('icecandidate', this.emit.bind(this, 'icecandidate'));
+    this.Connection.addEventListener('icecandidate', function(Event){
+      if(Event.candidate){
+        Me.emit('candidate', {
+          type: 'Candidate',
+          label: Event.candidate.sdpMLineIndex,
+          id: Event.candidate.sdpMid,
+          candidate: Event.candidate.candidate
+        });
+      }
+    });
   }
   addMedia(Constraints){
     this.MediaConstraints = Constraints || {
@@ -36,12 +45,18 @@ class WebRTC extends EventEmitter{
         Me.Connection.setLocalDescription(Offer);
         Resolve(Offer);
       }, Reject, {
-        "mandatory": {
-          "OfferToReceiveAudio": Me.MediaConstraints.audio || false,
-          "OfferToReceiveVideo": Me.MediaConstraints.video ? true : false
+        mandatory: {
+          OfferToReceiveAudio: Boolean(Me.MediaConstraints.audio),
+          OfferToReceiveVideo: Boolean(Me.MediaConstraints.video)
         }
       });
     });
+  }
+  gotOffer(Offer){
+    let Me = this
+    return this.setRemote(Offer).then(function(){
+        return Me.createAnswer()
+      })
   }
   setRemote(Offer){
     let Me = this;
