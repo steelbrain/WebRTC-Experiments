@@ -1,6 +1,8 @@
 WebRTC-Experiments
 =========
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/steelbrain/WebRTC-Experiments.svg)](https://greenkeeper.io/)
+
 A collection of WebRTC Experiments that I do in my free time. This repo contains some really useful JS classes that can make working with WebRTC a piece of chocolate cake.
 
 __Note:__ This project uses [Le-Emitter][Le-Emitter] as it's Event Emitter.
